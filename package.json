@@ -1,0 +1,37 @@
+{
+  "name": "diff-verify-cli",
+  "version": "1.0.0",
+  "description": "Verify that a command generates files which match existing files on disk",
+  "type": "module",
+  "bin": {
+    "diff-verify": "./cli.js",
+    "diff-verify-cli": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yolk-HQ/diff-verify-cli.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yolk-HQ/diff-verify-cli/issues"
+  },
+  "homepage": "https://github.com/Yolk-HQ/diff-verify-cli#readme",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "del": "6.0.0",
+    "diff": "5.0.0",
+    "execa": "5.1.1",
+    "globby": "12.0.0",
+    "is-path-cwd": "2.2.0",
+    "is-path-inside": "4.0.0",
+    "meow": "10.1.1",
+    "move-file": "2.1.0",
+    "path-exists": "4.0.0",
+    "prettier": "2.3.2"
+  }
+}
