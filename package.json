@@ -30,7 +30,6 @@
     "is-path-cwd": "2.2.0",
     "is-path-inside": "4.0.0",
     "meow": "10.1.1",
-    "move-file": "2.1.0",
     "path-exists": "4.0.0",
     "prettier": "2.3.2"
   }

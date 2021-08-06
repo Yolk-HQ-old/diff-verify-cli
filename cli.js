@@ -9,15 +9,15 @@ import { globby } from 'globby';
 import isPathCwd from 'is-path-cwd';
 import isPathInside from 'is-path-inside';
 import meow from 'meow';
-import moveFile from 'move-file';
 import pathExists from 'path-exists';
 
+const copyFile = fs.promises.copyFile;
 const readFile = fs.promises.readFile;
 
 const cli = meow(
   `
   Verify that a command generates files which match existing files on disk.
-  Files matching the path/glob specified by '-p' will be renamed with a '.tmp' suffix, then the
+  Files matching the path/glob specified by '-p' will be copied with a '.tmp' suffix, then the
   command will be executed, and newly-generated files will be compared with the existing '.tmp'
   files. If a diff is found, then diff-verify will exit with a status code of 1.
   
@@ -27,7 +27,7 @@ const cli = meow(
   Examples
     $ diff-verify -p apps/bot-studio-web/graphql-types.ts -- node_modules/.bin/graphql-codegen --config apps/bot-studio-web/codegen.yml
 
-    $ diff-verify -p apps/admin-web/locales -- nx run admin-web:linguiExtract
+    $ diff-verify -p apps/admin-web/locales -- pnpm run nx -- run admin-web:linguiExtract
 `,
   {
     importMeta: import.meta,
@@ -48,8 +48,8 @@ const cli = meow(
 const log = (prefix, message) => {
   let p = '';
   switch (prefix) {
-    case 'rename':
-      p = chalk.blue('rename');
+    case 'copy':
+      p = chalk.blue('copy');
       break;
     case 'emit':
       p = chalk.yellow('emit');
@@ -86,15 +86,15 @@ const log = (prefix, message) => {
   const dryRun = cli.flags.dryRun;
   const files = await globby(cli.flags.path);
 
-  // Rename each file to *.tmp
+  // Copy each file to *.tmp
   for (const file of files) {
     const tempFile = `${file}.tmp`;
     if (isPathCwd(file)) {
-      throw new Error(`"${file}": Cannot rename the current working directory.`);
+      throw new Error(`"${file}": Cannot copy the current working directory.`);
     }
     if (!isPathInside(file, process.cwd())) {
       throw new Error(
-        `"${file}": Cannot rename files/directories outside the current working directory.`,
+        `"${file}": Cannot copy files/directories outside the current working directory.`,
       );
     }
     if (await pathExists(tempFile)) {
@@ -103,29 +103,16 @@ const log = (prefix, message) => {
   }
   for (const file of files) {
     const tempFile = `${file}.tmp`;
-    log('rename', `"${file}" -> "${tempFile}"`);
+    log('copy', `"${file}" -> "${tempFile}"`);
     if (dryRun) continue;
 
-    await moveFile(file, tempFile);
+    await copyFile(file, tempFile);
   }
 
   // Run emit command
   log('emit', emitCommand.join(' '));
   if (!dryRun) {
     await execa(emitCommand[0], emitCommand.slice(1), { stdio: 'inherit' });
-  }
-
-  // Expect files to be emitted
-  let emitFailed = false;
-  for (const file of files) {
-    if (!(await pathExists(file))) {
-      log('error', `Command failed to emit "${file}".`);
-      emitFailed = true;
-    }
-  }
-  if (emitFailed) {
-    process.exitCode = 1;
-    return;
   }
 
   // Diff each file
