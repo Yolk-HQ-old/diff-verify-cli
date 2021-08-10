@@ -26,7 +26,6 @@
   "homepage": "https://github.com/Yolk-HQ/diff-verify-cli#readme",
   "dependencies": {
     "chalk": "4.1.2",
-    "del": "6.0.0",
     "diff": "5.0.0",
     "execa": "5.1.1",
     "globby": "12.0.0",
@@ -34,6 +33,7 @@
     "is-path-inside": "4.0.0",
     "jest": "27.0.6",
     "meow": "10.1.1",
+    "move-file": "2.1.0",
     "npm-run-all": "4.1.5",
     "path-exists": "4.0.0",
     "prettier": "2.3.2"
