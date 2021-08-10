@@ -79,7 +79,7 @@ const log = (prefix, message) => {
   const emitCommand = cli.input;
   if (emitCommand.length === 0) {
     log('error', 'Missing command');
-    cli.showHelp(1);
+    cli.showHelp(2);
     return;
   }
 
