@@ -120,38 +120,40 @@ const log = (prefix, message) => {
 
   // Run emit command
   log('emit', emitCommand.join(' '));
-  if (!dryRun) {
-    await execa(emitCommand[0], emitCommand.slice(1), { stdio: 'inherit' });
-  }
-
-  // Diff each file
-  let diffFound = false;
-  for (const file of files) {
-    const tempFile = `${file}.tmp`;
-    log('diff', `"${file}" <> "${tempFile}"`);
-    if (dryRun) continue;
-
-    const fileContents = await readFile(file, { encoding: 'utf8' });
-    const tempFileContents = await readFile(tempFile, { encoding: 'utf8' });
-    const diff = diffLines(tempFileContents, fileContents);
-    if (diff.length > 1) {
-      log('error', `Found diff in "${file}".`);
-      diffFound = true;
-      const patch = createTwoFilesPatch(tempFile, file, tempFileContents, fileContents);
-      console.log(patch);
+  try {
+    if (!dryRun) {
+      await execa(emitCommand[0], emitCommand.slice(1), { stdio: 'inherit' });
     }
-  }
 
-  if (diffFound) {
-    process.exitCode = 1;
-  }
+    // Diff each file
+    let diffFound = false;
+    for (const file of files) {
+      const tempFile = `${file}.tmp`;
+      log('diff', `"${file}" <> "${tempFile}"`);
+      if (dryRun) continue;
 
-  // Return *.tmp files to their original location
-  for (const file of files) {
-    const tempFile = `${file}.tmp`;
-    log('move', `"${tempFile}" -> "${file}"`);
-    if (dryRun) continue;
+      const fileContents = await readFile(file, { encoding: 'utf8' });
+      const tempFileContents = await readFile(tempFile, { encoding: 'utf8' });
+      const diff = diffLines(tempFileContents, fileContents);
+      if (diff.length > 1) {
+        log('error', `Found diff in "${file}".`);
+        diffFound = true;
+        const patch = createTwoFilesPatch(tempFile, file, tempFileContents, fileContents);
+        console.log(patch);
+      }
+    }
 
-    await moveFile(tempFile, file);
+    if (diffFound) {
+      process.exitCode = 1;
+    }
+  } finally {
+    // Return *.tmp files to their original location
+    for (const file of files) {
+      const tempFile = `${file}.tmp`;
+      log('move', `"${tempFile}" -> "${file}"`);
+      if (dryRun) continue;
+
+      await moveFile(tempFile, file);
+    }
   }
 })();
