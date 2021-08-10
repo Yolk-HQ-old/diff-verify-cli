@@ -80,6 +80,8 @@ const log = (prefix, message) => {
   }
 };
 
+const getTmpFileName = (file) => `${file}.tmp`;
+
 (async () => {
   const emitCommand = cli.input;
   if (emitCommand.length === 0) {
@@ -97,7 +99,7 @@ const log = (prefix, message) => {
 
   // Ensure files are within the current working directory, then copy each file to *.tmp
   for (const file of files) {
-    const tempFile = `${file}.tmp`;
+    const tempFile = getTmpFileName(file);
     if (isPathCwd(file)) {
       throw new Error(`"${file}": Cannot copy the current working directory.`);
     }
@@ -111,7 +113,7 @@ const log = (prefix, message) => {
     }
   }
   for (const file of files) {
-    const tempFile = `${file}.tmp`;
+    const tempFile = getTmpFileName(file);
     log('copy', `"${file}" -> "${tempFile}"`);
     if (dryRun) continue;
 
@@ -128,7 +130,7 @@ const log = (prefix, message) => {
     // Diff each file
     let diffFound = false;
     for (const file of files) {
-      const tempFile = `${file}.tmp`;
+      const tempFile = getTmpFileName(file);
       log('diff', `"${file}" <> "${tempFile}"`);
       if (dryRun) continue;
 
@@ -149,7 +151,7 @@ const log = (prefix, message) => {
   } finally {
     // Return *.tmp files to their original location
     for (const file of files) {
-      const tempFile = `${file}.tmp`;
+      const tempFile = getTmpFileName(file);
       log('move', `"${tempFile}" -> "${file}"`);
       if (dryRun) continue;
 
