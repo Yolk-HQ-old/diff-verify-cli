@@ -1,6 +1,8 @@
 # diff-verify-cli
 
-Verify that a command generates files which match existing files on disk
+Verify that a command generates files which match existing files on disk.
+
+[![npm version](https://badge.fury.io/js/diff-verify-cli.svg)](https://www.npmjs.com/package/diff-verify-cli)
 
 ### Installation
 
